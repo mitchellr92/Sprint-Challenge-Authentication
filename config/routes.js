@@ -1,4 +1,7 @@
 const axios = require('axios');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('../database/dbHelpers');
 
 const { authenticate } = require('../auth/authenticate');
 
@@ -9,7 +12,15 @@ module.exports = server => {
 };
 
 function register(req, res) {
-  // implement user registration
+  const user = req.body;
+  user.password = bcrypt.hashSync(user.password, 10);
+  db.insertUser(user)
+    .then(user => {
+      res.status(201).json({ message: 'You are now registered!' })
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Failure to register new account' });
+    })
 }
 
 function login(req, res) {
