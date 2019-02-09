@@ -12,8 +12,8 @@ module.exports = server => {
 };
 
 function register(req, res) {
-  const user = req.body;
-  user.password = bcrypt.hashSync(user.password, 10);
+  const credentials = req.body;
+  credentials.password = bcrypt.hashSync(credentials.password, 10);
   db.insertUser(user)
     .then(user => {
       res.status(201).json({ message: 'You are now registered!' })
@@ -24,13 +24,14 @@ function register(req, res) {
 }
 
 function login(req, res) {
-  const loggedInUser = req.body;
+  const credentials = req.body;
 
-  db.userLogin(loggedInUser.username)
+  db.userLogin(credentials.username)
     .then(user => {
-      if (user && bcrypt.compareSync(loggedInUser.password, user.password)) {
+      if (user && bcrypt.compareSync(credentials.password, user.password)) {
         const token = generateToken(user);
-        res.status(200).json({ message: 'You are logged in!' })
+        console.log('users token', token)
+        res.status(200).json({ message: 'You are logged in!', token })
       } else {
         res.status(404).json({ message: 'Incorrect username or password' })
       }
