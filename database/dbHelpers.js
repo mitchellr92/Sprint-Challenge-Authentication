@@ -6,6 +6,10 @@ module.exports = {
 
     insertUser: (user) => {
         return db('users').insert(user);
+    },
+
+    userLogin: (username) => {
+        return db('users').where({ username }).first();
     }
 
 };

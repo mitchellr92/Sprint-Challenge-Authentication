@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../database/dbHelpers');
 
-const { authenticate } = require('../auth/authenticate');
+const { authenticate, generateToken } = require('../auth/authenticate');
 
 module.exports = server => {
   server.post('/api/register', register);
@@ -24,7 +24,20 @@ function register(req, res) {
 }
 
 function login(req, res) {
-  // implement user login
+  const loggedInUser = req.body;
+
+  db.userLogin(loggedInUser.username)
+    .then(user => {
+      if (user && bcrypt.compareSync(loggedInUser.password, user.password)) {
+        const token = generateToken(user);
+        res.status(200).json({ message: 'You are logged in!' })
+      } else {
+        res.status(404).json({ message: 'Incorrect username or password' })
+      }
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
 }
 
 function getJokes(req, res) {
